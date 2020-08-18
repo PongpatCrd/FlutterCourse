@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:sprintf/sprintf.dart';
+
+import './question.dart';
+import './answer.dart';
 
 void main() {
   runApp(AwesomeApp());
@@ -11,22 +15,51 @@ class AwesomeApp extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
     // TODO: implement createState
-    return AwesomeAppState();
+    return _AwesomeAppState();
   }
 }
 
-class AwesomeAppState extends State<AwesomeApp> {
-  var questionIndex = 0;
-  void answerQuestion1() {
+class _AwesomeAppState extends State<AwesomeApp> {
+  var questions = [
+    {
+      'questionText': 'What\'s your favorite color?',
+      'answerText': ['Black', 'Red', 'white', 'green']
+    },
+    {
+      'questionText': 'What\s your favorite animal?',
+      'answerText': ['Dog', 'Cat', 'Rabbit', 'Squirrel']
+    },
+    {
+      'questionText': 'What\s the name of this day?',
+      'answerText': [
+        'Monday',
+        'Tuesday',
+        'Wednesday',
+        'Thursday',
+        'Friday',
+        'Satuday',
+        'Sunday'
+      ]
+    },
+    {
+      'questionText': 'You do this day the best?',
+      'answerText': ['Yep', 'Nop']
+    },
+  ];
+
+  var _questionIndex = 0;
+  void _answerQuestion() {
     setState(() {
-      questionIndex = 0;
+      if (_questionIndex + 1 >= questions.length) {
+        _questionIndex = 0;
+      }
+      print(sprintf('Answer question %s', [_questionIndex]));
+      _questionIndex += 1;
     });
-    print('Answer question 1');
   }
 
   @override
   Widget build(BuildContext context) {
-    var questions = ['Question 1', 'Question 2', 'Question 3', 'Question 4'];
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
@@ -34,29 +67,11 @@ class AwesomeAppState extends State<AwesomeApp> {
         ),
         body: Column(
           children: <Widget>[
-            Text(questions[questionIndex]),
-            RaisedButton(
-              onPressed: answerQuestion1,
-              child: Text("Answer Question 1"),
-            ),
-            RaisedButton(
-              onPressed: () {
-                setState(() {
-                  questionIndex = 1;
-                });
-                print("Answer question 2");
-              },
-              child: Text("Answer Question 2"),
-            ),
-            RaisedButton(
-              onPressed: () {
-                setState(() {
-                  questionIndex = 2;
-                });
-                print("Answer question 3");
-              },
-              child: Text("Answer Question 3"),
-            ),
+            Question(questions[_questionIndex]['questionText']),
+            ...(questions[_questionIndex]['answerText'] as List<String>)
+                .map((answer) {
+              return Answer(_answerQuestion, answer);
+            }).toList(),
           ],
         ),
       ),

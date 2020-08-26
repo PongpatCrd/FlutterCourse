@@ -3,6 +3,8 @@ import 'package:sprintf/sprintf.dart';
 
 import './question.dart';
 import './answer.dart';
+import './quize.dart';
+import './result.dart';
 
 void main() {
   runApp(AwesomeApp());
@@ -20,61 +22,85 @@ class AwesomeApp extends StatefulWidget {
 }
 
 class _AwesomeAppState extends State<AwesomeApp> {
-  var questions = [
+  final _questions = const [
     {
       'questionText': 'What\'s your favorite color?',
-      'answerText': ['Black', 'Red', 'white', 'green']
-    },
-    {
-      'questionText': 'What\s your favorite animal?',
-      'answerText': ['Dog', 'Cat', 'Rabbit', 'Squirrel']
-    },
-    {
-      'questionText': 'What\s the name of this day?',
       'answerText': [
-        'Monday',
-        'Tuesday',
-        'Wednesday',
-        'Thursday',
-        'Friday',
-        'Satuday',
-        'Sunday'
+        {'text': 'Black', 'score': 10},
+        {'text': 'Red', 'score': 5},
+        {'text': 'White', 'score': 1},
+        {'text': 'green', 'score': 3}
       ]
     },
     {
-      'questionText': 'You do this day the best?',
-      'answerText': ['Yep', 'Nop']
+      'questionText': 'What\s your favorite animal?',
+      'answerText': [
+        {'text': 'Dog', 'score': 2},
+        {'text': 'Cat', 'score': 2},
+        {'text': 'Fish', 'score': 4},
+        {'text': 'Monky', 'score': 5}
+      ]
+    },
+    {
+      'questionText': 'What\s your favorite day?',
+      'answerText': [
+        {'text': 'Sunday', 'score': 1},
+        {'text': 'Monday', 'score': 10},
+        {'text': 'Tuesday', 'score': 9},
+        {'text': 'Wenesday', 'score': 8},
+        {'text': 'Thuresday', 'score': 7},
+        {'text': 'Firday', 'score': 1},
+        {'text': 'Satuday', 'score': 1}
+      ]
+    },
+    {
+      'questionText': 'Did you do this day the best?',
+      'answerText': [
+        {'text': 'Yep', 'score': 1},
+        {'text': 'Nop', 'score': 7}
+      ]
     },
   ];
 
   var _questionIndex = 0;
-  void _answerQuestion() {
+  var _totalScore = 0;
+
+  void _resetQuize() {
     setState(() {
-      if (_questionIndex + 1 >= questions.length) {
-        _questionIndex = 0;
-      }
-      print(sprintf('Answer question %s', [_questionIndex]));
-      _questionIndex += 1;
+      _questionIndex = 0;
+      _totalScore = 0;
     });
+  }
+
+  void _answerQuestion(int score) {
+    setState(() {
+      _totalScore += score;
+      _questionIndex += 1;
+      print(sprintf('Answer question %s', [_questionIndex]));
+    });
+
+    if (_questionIndex < _questions.length) {
+      print('We had more questions!');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(
-          title: Text('This Is An Awesome App!!'),
-        ),
-        body: Column(
-          children: <Widget>[
-            Question(questions[_questionIndex]['questionText']),
-            ...(questions[_questionIndex]['answerText'] as List<String>)
-                .map((answer) {
-              return Answer(_answerQuestion, answer);
-            }).toList(),
-          ],
-        ),
-      ),
+          appBar: AppBar(
+            title: Text('This Is An Awesome App!!'),
+          ),
+          body: _questionIndex < _questions.length
+              ? Quize(
+                  answerQuestion: _answerQuestion,
+                  questionIndex: _questionIndex,
+                  questions: _questions,
+                )
+              : Result(
+                  resultScore: _totalScore,
+                  resethandler: _resetQuize,
+                )),
     );
   }
 }
